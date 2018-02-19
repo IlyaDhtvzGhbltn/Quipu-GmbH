@@ -1,0 +1,109 @@
+﻿<Window x:Class="LiteParcer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LiteParcer"
+        mc:Ignorable="d"
+        xmlns:converter="clr-namespace:LiteParcer.Logik.Converters"
+        xmlns:model="clr-namespace:LiteParcer.ViewModels"
+        Title="a Parcer" Height="355" Width="800">
+    <Window.DataContext>
+        <model:CounterModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <converter:EmptyStringBoolConverter x:Key="StringBoolConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.092*"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="0.563*"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="0.1273*"/>
+        </Grid.RowDefinitions>
+        
+            
+        <Grid Grid.Row="0" Background="Wheat">
+            <StackPanel
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Margin="2"
+                    VerticalAlignment="Top">
+                <Button 
+                        Height="20" 
+                            Width="90"
+                            Content="Browse"
+                            Command="{Binding OpenFileDialog}"
+                            Margin="4"/>
+                <Button 
+                        Height="20" 
+                        Width="90" 
+                        Content="Analyse"
+                        Command="{Binding Analyze}"
+                        Margin="4"
+                        IsEnabled="{Binding ElementName=TagBox, Path=Text, Converter={StaticResource StringBoolConverter}}"
+                        />
+                <TextBox Width="100"
+                         Name="TagBox"
+                         Text="{Binding TagSearch, UpdateSourceTrigger=PropertyChanged}"
+                         Height="22"/>
+                <Button
+                        Height="20"
+                        Width="90"
+                        Content="Clear"
+                        Command="{Binding Clear}"
+                        Margin="4"/>
+            </StackPanel>
+        </Grid>
+        <GridSplitter Grid.Row="1" Height="5"
+                      HorizontalAlignment="Stretch"/>
+        <Grid Grid.Row="2" Background="Beige" >
+                
+            <ListView Margin="10"
+                    Name="ListUrlView"
+                    ItemsSource="{Binding URLsCount}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Run Text="{Binding Url}"/>
+                            <Run Text=" : "/>
+                            <Run Text="{Binding Tag}"/>
+                            <Run Text=" : "/>
+                            <Run Text="{Binding Count}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <MultiBinding Converter="{converter:BrushEqualConverter EqualValue=Red, NotEqualValue=Azure}">
+                                    <Binding Path="Count"/>
+                                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=Window}" Path="DataContext.MaxItem"/>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+
+            </Grid>
+        <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch"/>
+        <Grid Grid.Row="4" Background="Bisque">
+            <StackPanel Orientation="Vertical">
+            <TextBlock Height="22" 
+                       FontSize="14"
+                       Text="{Binding Message}"
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Top"/>
+                <ProgressBar Height="22" 
+                             Margin="22,0"
+                             Value="{Binding Progress}"
+                             Maximum="{Binding TotalProgressBarValue}">
+                </ProgressBar>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Window>
